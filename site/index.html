@@ -1,0 +1,537 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AP Assure App</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: a phone frame centred on the page; screens stack inside it, tab bar floats at the bottom of tab screens. */
+:root{
+  --orange:#EE6A1F; --orange-deep:#C9500F; --orange-soft:#FDE6D3; --orange-tint:#FFF1E4;
+  --navy:#16264A; --navy-soft:#3B4A6B; --cream:#FCF5EA; --card:#FFFDF9; --line:#EFE2D0;
+  --green:#2F8F5B; --green-soft:#DDF1E4; --blue:#2D5BD0; --blue-soft:#E1EAFB; --red:#C23B2E;
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:#E9DFCF;color:var(--navy);font-family:var(--font);font-size:14px;
+  padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:grid;place-items:center;overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+input,textarea{font:inherit;color:inherit}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.phone{position:relative;width:390px;max-width:100%;height:min(844px,100%);background:var(--cream);border:10px solid #14233f;border-radius:46px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(22,38,74,.45),0 0 0 2px #2b3c61}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#14233f;border-radius:0 0 18px 18px;z-index:60}
+.sb{position:absolute;top:0;left:0;right:0;height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-weight:700;font-size:12px;z-index:55;pointer-events:none}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--cream);padding-top:44px}
+.screen.on{display:flex;animation:in .32s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.body{flex:1;overflow-y:auto;padding:6px 18px 22px;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.tabpad{padding-bottom:92px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:4px 14px 8px;min-height:44px}
+.top h2{margin:0;font-size:16px;font-weight:700}
+.ib{width:36px;height:36px;display:grid;place-items:center;border-radius:50%}
+.ib:active{background:var(--orange-soft)}
+.btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 20px;border-radius:16px;background:var(--orange);color:#fff;font-weight:700;font-size:15px;box-shadow:0 8px 18px -8px rgba(238,106,31,.8);transition:transform .15s,filter .15s}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{background:#E6D8C6;color:#A7957E;box-shadow:none;cursor:not-allowed}
+.btn.ghost{background:var(--card);color:var(--navy);border:1.5px solid var(--line);box-shadow:none}
+.btn.sm{padding:12px 16px;font-size:13px;border-radius:13px}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.wm{font-weight:800;letter-spacing:-.5px;font-size:20px;color:#B3261E}
+.wm i{font-style:normal;color:var(--navy)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px}
+.pill.o{background:var(--orange-soft);color:var(--orange-deep)} .pill.g{background:var(--green-soft);color:var(--green)} .pill.b{background:var(--blue-soft);color:var(--blue)} .pill.n{background:#EDE6DA;color:var(--navy-soft)}
+/* splash */
+#splash{padding:0;background:var(--cream);align-items:center;justify-content:center;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(1px)}
+.sp-mark{position:relative;text-align:center;z-index:2}
+.sp-mark .wm{font-size:38px}
+.sp-mark p{margin:8px 0 0;color:var(--navy-soft);font-weight:500}
+.sp-ring{width:84px;height:84px;margin:0 auto 14px;border-radius:50%;border:10px solid var(--orange);border-right-color:#7A3FB0;border-bottom-color:#B3261E;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* home */
+.hero{position:relative;padding:6px 0 4px;min-height:190px}
+.hero h1{margin:6px 0 8px;font-size:27px;line-height:1.1;font-weight:800;max-width:11ch;letter-spacing:-.5px;text-wrap:balance}
+.hero p{margin:0;color:var(--navy-soft);font-weight:500;max-width:15ch;line-height:1.35}
+.hero svg.house{position:absolute;right:-18px;top:0;width:190px}
+.cta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:linear-gradient(135deg,#F37A2E,#E85C14);color:#fff;border-radius:20px;padding:14px;box-shadow:0 12px 24px -12px rgba(238,106,31,.9);margin:10px 0 12px}
+.cta .ic{width:52px;height:52px;border-radius:50%;background:#fff;color:var(--orange);display:grid;place-items:center;flex:none}
+.cta .ic svg{width:26px;height:26px}
+.cta b{display:block;font-size:16px} .cta small{opacity:.9;font-size:12px}
+.cta .ch{margin-left:auto}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{display:flex;flex-direction:column;gap:10px;text-align:left;padding:14px;position:relative;font-weight:600;line-height:1.25}
+.tile .tic{width:38px;height:38px;border-radius:10px;background:#E8EEF8;color:var(--navy-soft);display:grid;place-items:center}
+.tile .bd{position:absolute;right:12px;top:12px;background:var(--orange);color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px}
+.promo{display:flex;align-items:center;gap:12px;margin-top:12px;padding:0;overflow:hidden;width:100%;text-align:left}
+.promo .pv{width:112px;height:84px;background:linear-gradient(160deg,#A9D4B0,#6FA77C);position:relative;flex:none}
+.promo b{font-size:13px;line-height:1.3;display:block;max-width:14ch}
+.promo .ch{margin-left:auto;margin-right:12px;width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center}
+.tabbar{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:none;justify-content:space-around;padding:8px 6px 14px;z-index:30}
+.tabbar.on{display:flex}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:#6B7690;padding:4px 14px;border-radius:12px}
+.tabbar button.on{color:var(--orange)}
+/* stepper */
+.steps{display:flex;align-items:flex-start;justify-content:space-between;padding:4px 22px 6px;position:relative}
+.steps::before{content:"";position:absolute;left:44px;right:44px;top:15px;height:2px;background:var(--line)}
+.st{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#8791A8;z-index:1;width:60px}
+.st .dot{width:22px;height:22px;border-radius:50%;background:var(--cream);border:2px solid var(--line);display:grid;place-items:center;color:#fff;margin-top:4px}
+.st .dot svg{width:12px;height:12px;stroke-width:3}
+.st.done .dot{background:var(--orange);border-color:var(--orange)}
+.st.cur .dot{background:var(--card);border-color:var(--orange);box-shadow:0 0 0 4px var(--orange-soft)}
+.st.cur .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.st.cur,.st.done{color:var(--navy)}
+/* camera */
+.foot{padding:10px 18px 18px;background:linear-gradient(180deg,rgba(252,245,234,0),var(--cream) 28%)}
+.vf{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:1/.78;background:#2A2118}
+.vf img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.vf .empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#E9D9C2;padding:30px;line-height:1.4}
+.vf .cn{position:absolute;width:34px;height:34px;border:3px solid #fff;opacity:.95}
+.cn.a{left:14px;top:14px;border-right:0;border-bottom:0;border-radius:12px 0 0 0}.cn.b{right:14px;top:14px;border-left:0;border-bottom:0;border-radius:0 12px 0 0}
+.cn.c{left:14px;bottom:14px;border-right:0;border-top:0;border-radius:0 0 0 12px}.cn.d{right:14px;bottom:14px;border-left:0;border-top:0;border-radius:0 0 12px 0}
+.zoom{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:6px;background:rgba(22,38,74,.55);padding:4px;border-radius:99px;backdrop-filter:blur(6px)}
+.zoom button{min-width:34px;height:30px;border-radius:99px;color:#fff;font-size:12px;font-weight:700}
+.zoom button.on{background:var(--orange)}
+.thumbs{display:flex;gap:10px;margin:12px 0}
+.th{position:relative;flex:1;aspect-ratio:1;border-radius:12px;overflow:hidden;border:2px solid transparent;background:#EFE4D3}
+.th.sel{border-color:var(--orange)}
+.th img{width:100%;height:100%;object-fit:cover}
+.th.add{border:2px dashed #CDBBA2;display:grid;place-items:center;color:#8A7A66;background:transparent}
+.th .rm{position:absolute;right:3px;top:3px;width:20px;height:20px;border-radius:50%;background:rgba(22,38,74,.75);color:#fff;display:grid;place-items:center}
+.th .rm svg{width:11px;height:11px;stroke-width:3}
+.shutter{display:block;margin:6px auto 12px;width:76px;height:76px;border-radius:50%;border:4px solid var(--orange);padding:5px;background:transparent}
+.shutter span{display:block;width:100%;height:100%;border-radius:50%;background:var(--orange);transition:transform .12s}
+.shutter:active span{transform:scale(.88)}
+.link{color:var(--orange-deep);font-weight:700;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.h3{font-weight:700;margin:4px 0 2px;font-size:15px}.sub{color:var(--navy-soft);font-size:12.5px;line-height:1.4;margin:0 0 10px}
+/* details */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.chip{padding:9px 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:13px}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.fl{display:block;font-weight:700;font-size:13px;margin-top:6px}
+.inp{width:100%;margin-top:6px;padding:13px 14px;border-radius:13px;border:1.5px solid var(--line);background:var(--card);outline:0}
+.inp:focus{border-color:var(--orange)}
+textarea.inp{resize:none;height:80px}
+/* analysis */
+.scan{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:1/1.05;background:#2A2118}
+.scan img{width:100%;height:100%;object-fit:cover}
+.scan::after{content:"";position:absolute;left:0;right:0;height:70px;top:-70px;background:linear-gradient(180deg,transparent,rgba(238,106,31,.55));border-bottom:2px solid #FFB07A;animation:sc 1.7s linear infinite}
+@keyframes sc{to{top:100%}}
+.scan.done::after{display:none}
+.stat{margin:14px 0;text-align:center;font-weight:700}
+.stat small{display:block;font-weight:500;color:var(--navy-soft);margin-top:4px;min-height:18px}
+.bar{height:6px;border-radius:4px;background:#E7DCCB;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width 1s ease}
+.res{display:flex;gap:0;overflow:hidden;position:relative}
+.res .rp{width:42%;position:relative;flex:none;min-height:150px}
+.res .rp img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.res .rp svg{position:absolute;inset:0;width:100%;height:100%}
+.res .rt{padding:12px 13px;flex:1;min-width:0}
+.res .rt b.big{display:block;font-size:17px;line-height:1.2;margin:6px 0 10px}
+.seen{display:flex;align-items:center;gap:12px;padding:10px 4px;font-size:13px;font-weight:500}
+.seen .si{width:34px;height:34px;border-radius:50%;background:#E8EEF8;color:var(--navy-soft);display:grid;place-items:center;flex:none}
+.rec{background:var(--orange-tint);border:1px solid #F8D2B3;border-radius:18px;padding:12px;margin-top:10px}
+.rec .rh{display:flex;gap:8px;align-items:center;color:var(--orange-deep);font-weight:800;font-size:13px}
+.rec p{margin:6px 0 12px;font-size:12.5px;color:var(--navy-soft);line-height:1.4}
+.note{font-size:11.5px;color:var(--navy-soft);line-height:1.4;margin:10px 2px 0;display:flex;gap:6px}
+.note svg{width:14px;height:14px;margin-top:1px}
+/* next */
+.nx-hero{border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#F3E6D2,#EAD9BF);height:178px;position:relative}
+.nx-hero svg{width:100%;height:100%}
+.nx-t{font-size:22px;font-weight:800;margin:16px 0 4px;letter-spacing:-.3px}
+.row{display:flex;align-items:center;gap:12px;padding:13px 14px;font-weight:600;font-size:13px;margin-top:9px}
+.row svg{color:var(--navy-soft)}
+/* book */
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#EFE4D3;border-radius:14px;padding:4px;gap:4px;margin:8px 0 14px}
+.seg button{padding:10px 6px;border-radius:11px;font-weight:700;font-size:13px;color:var(--navy-soft)}
+.seg button.on{background:var(--card);color:var(--navy);box-shadow:0 2px 6px rgba(22,38,74,.12)}
+.dates{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px;scrollbar-width:none}
+.dates::-webkit-scrollbar{display:none}
+.dt{flex:none;width:56px;padding:10px 0;border-radius:15px;border:1.5px solid var(--line);background:var(--card);text-align:center;font-weight:700}
+.dt small{display:block;font-size:11px;color:var(--navy-soft);font-weight:600}.dt b{font-size:18px}
+.dt.on{background:var(--orange);border-color:var(--orange);color:#fff}.dt.on small{color:#FFE2CC}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 14px}
+.slot{padding:12px;border-radius:13px;border:1.5px solid var(--line);background:var(--card);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.slot.on{border-color:var(--orange);background:var(--orange-tint);color:var(--orange-deep)}
+.slot[disabled]{opacity:.45;text-decoration:line-through;cursor:not-allowed}
+.sum{padding:12px 14px;font-size:12.5px;line-height:1.5;color:var(--navy-soft);margin-bottom:14px}
+.sum b{color:var(--navy)}
+/* cases */
+.cc{display:flex;gap:12px;padding:12px;margin-bottom:12px;width:100%;text-align:left;align-items:center}
+.cc .cp{width:62px;height:62px;border-radius:13px;overflow:hidden;flex:none;background:#EFE4D3}
+.cc .cp img{width:100%;height:100%;object-fit:cover}
+.cc .ct{flex:1;min-width:0}.cc b{display:block;font-size:14px;margin-bottom:2px}
+.cc small{color:var(--navy-soft);font-size:11.5px;display:block;margin-bottom:6px}
+.prog{display:flex;gap:3px;margin-top:8px}.prog i{flex:1;height:4px;border-radius:2px;background:#E7DCCB}.prog i.f{background:var(--orange)}.prog.ok i.f{background:var(--green)}
+.cs{display:flex;gap:14px;padding:14px;align-items:center;margin-bottom:14px}
+.cs .cp{width:76px;height:76px;border-radius:15px;overflow:hidden;flex:none}.cs .cp img{width:100%;height:100%;object-fit:cover}
+.cs b{font-size:16px;display:block;margin:4px 0 2px}.cs small{color:var(--navy-soft)}
+.tl{padding:6px 16px;margin-bottom:14px}
+.tls{display:flex;gap:14px;position:relative;padding:11px 0}
+.tls:not(:last-child)::before{content:"";position:absolute;left:11px;top:33px;bottom:-11px;width:2px;background:var(--line)}
+.tls.done:not(:last-child)::before{background:var(--orange)}
+.tls .d{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;flex:none;color:#fff;z-index:1}
+.tls.done .d{background:var(--orange);border-color:var(--orange)}.tls.cur .d{border-color:var(--orange);box-shadow:0 0 0 4px var(--orange-soft)}
+.tls .d svg{width:12px;height:12px;stroke-width:3}
+.tls b{font-size:13px;display:block}.tls small{color:var(--navy-soft);font-size:11.5px}
+.tls.pend b{color:#8791A8}
+/* warranty */
+.flip{perspective:1000px;margin-bottom:12px}
+.fi{position:relative;transition:transform .6s;transform-style:preserve-3d;height:318px}
+.flip.back .fi{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;overflow:hidden;background:var(--card);border:1.5px solid #F1C9A6;box-shadow:0 14px 26px -16px rgba(201,80,15,.7)}
+.face.bk{transform:rotateY(180deg);background:#F7F2EA}
+.wh{background:linear-gradient(135deg,#F37A2E,#E0540F);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
+.wh small{font-weight:600;opacity:.9}
+.wb{display:flex;gap:14px;padding:16px;align-items:center}
+.qr{width:128px;height:128px;flex:none;padding:8px;background:#fff;border-radius:12px;border:1px solid var(--line);cursor:pointer;position:relative}
+.qr svg{width:100%;height:100%;display:block}
+.wy b{display:block;font-size:34px;line-height:1;color:var(--navy);letter-spacing:-1px}.wy b small{font-size:14px;letter-spacing:0;margin-left:4px}
+.wy span{display:block;font-size:12px;color:var(--navy-soft);margin-top:6px;line-height:1.4}
+.ticks{padding:0 16px 12px;display:grid;gap:5px;font-size:12.5px;font-weight:600}
+.ticks div{display:flex;gap:8px;align-items:center}.ticks svg{width:15px;height:15px;color:var(--green);stroke-width:3}
+.wf{display:flex;justify-content:space-between;align-items:center;padding:0 16px 14px;font-size:11.5px;color:var(--navy-soft);font-weight:600}
+.wf em{font-style:normal;color:var(--orange-deep);font-weight:800}
+.locked{padding:18px;text-align:center;margin-bottom:12px;border-style:dashed}
+.locked .lq{width:96px;height:96px;margin:0 auto 10px;background:repeating-conic-gradient(#E9DDCB 0 25%,transparent 0 50%) 0 0/16px 16px;border-radius:12px;opacity:.7}
+.lock-t{font-weight:800;margin-bottom:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.claim{padding:14px;margin-bottom:14px}
+.claim h4{margin:0 0 6px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+/* sheet & toast */
+.sheet{position:absolute;inset:0;background:rgba(22,38,74,.5);z-index:80;display:none;align-items:flex-end}
+.sheet.on{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sh{background:var(--cream);width:100%;border-radius:26px 26px 0 0;padding:16px 18px 24px;max-height:86%;overflow-y:auto;animation:up .3s ease}
+@keyframes up{from{transform:translateY(40px)}}
+.sh h3{margin:0 0 4px;font-size:18px}
+.log{display:flex;gap:10px;align-items:center;padding:10px 12px;margin-top:8px;font-size:13px;font-weight:600}
+.log svg{color:var(--green);stroke-width:3;width:16px;height:16px}.log small{margin-left:auto;color:var(--navy-soft);font-weight:600}
+.toast{position:absolute;left:18px;right:18px;top:54px;background:var(--navy);color:#fff;padding:12px 14px;border-radius:14px;z-index:90;font-weight:600;font-size:13px;opacity:0;transform:translateY(-12px);pointer-events:none;transition:.28s}
+.toast.on{opacity:1;transform:none}
+.ok-ring{width:72px;height:72px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:6px auto 12px}
+.ok-ring svg{width:34px;height:34px;stroke-width:3}
+.center{text-align:center}
+.learn{padding:14px;margin-bottom:12px}.learn b{display:block;margin-bottom:4px}.learn p{margin:0;color:var(--navy-soft);font-size:12.5px;line-height:1.45}
+@media (max-width:520px){.phone{border-width:6px;border-radius:34px}.sb,.notch{display:none}.screen{padding-top:12px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head><body>
+<div class="phone" id="phone">
+  <div class="notch"></div>
+  <div class="sb"><span>9:41</span><span>●●● 5G ▮</span></div>
+
+  <section class="screen on" id="splash">
+    <div class="blob" style="width:220px;height:220px;right:-70px;top:-60px;background:radial-gradient(circle at 40% 40%,#FFC477,#F58A2B)"></div>
+    <div class="blob" style="width:380px;height:300px;left:-90px;bottom:-110px;background:radial-gradient(circle at 40% 30%,#F7A040,#E5532B 55%,#B3261E)"></div>
+    <div class="blob" style="width:200px;height:200px;left:70px;bottom:-130px;background:radial-gradient(circle,#8B54C0,#4F3A9A)"></div>
+    <div class="sp-mark"><div class="sp-ring"></div><div class="wm">asian<i>paints</i></div><p>Homes for what's next</p></div>
+  </section>
+
+  <section class="screen" id="home"></section>
+  <section class="screen" id="photos"></section>
+  <section class="screen" id="details"></section>
+  <section class="screen" id="analysis"></section>
+  <section class="screen" id="next"></section>
+  <section class="screen" id="book"></section>
+  <section class="screen" id="cases"></section>
+  <section class="screen" id="case"></section>
+  <section class="screen" id="services"></section>
+  <section class="screen" id="learn"></section>
+
+  <nav class="tabbar" id="tabbar" aria-label="Main"></nav>
+  <div class="sheet" id="sheet"><div class="sh" id="sheetBody"></div></div>
+  <div class="toast" id="toast" role="status"></div>
+  <input type="file" id="file" accept="image/*" capture="environment" hidden>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const IC={
+camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+drop:'<path d="M12 2.7l5.66 5.64a8 8 0 1 1-11.31 0z"/>',
+doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+tool:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+back:'<path d="M15 18l-6-6 6-6"/>',right:'<path d="M9 18l6-6-6-6"/>',check:'<path d="M20 6L9 17l-5-5"/>',
+shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',
+help:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>',
+layers:'<path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>',
+zap:'<path d="M13 2L3 14h9l-1 8 10-12h-9z"/>',
+qr:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h1"/>',
+alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/>',
+flip:'<path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+img:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+bulb:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V18h6v-1.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/>'
+};
+const ic=(n,c='')=>`<svg class="i ${c}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||''}</svg>`;
+
+/* ---------- procedural demo photos ---------- */
+function rng(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+function drawScene(kind,w=480,h=560){
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');const r=rng(kind.length*977+kind.charCodeAt(0)*31);
+  const blot=(x,y,rad,col,a)=>{const gr=g.createRadialGradient(x,y,0,x,y,rad);gr.addColorStop(0,`rgba(${col},${a})`);gr.addColorStop(1,`rgba(${col},0)`);g.fillStyle=gr;g.beginPath();g.arc(x,y,rad,0,7);g.fill()};
+  const speck=(x0,y0,spread,n,col)=>{for(let i=0;i<n;i++){const x=x0+(r()-.5)*spread,y=y0+(r()-.5)*spread*.7;g.fillStyle=`rgba(${col},${.25+r()*.45})`;g.beginPath();g.arc(x,y,1+r()*3.2,0,7);g.fill()}};
+  if(kind==='ceiling'){
+    g.fillStyle='#e0d1b7';g.fillRect(0,0,w,h);
+    g.fillStyle='#f1e8d8';g.beginPath();g.moveTo(0,0);g.lineTo(w,0);g.lineTo(w,h*.2);g.lineTo(w*.45,h*.38);g.lineTo(0,h*.22);g.fill();
+    g.fillStyle='#d8c7ab';g.beginPath();g.moveTo(w*.45,h*.38);g.lineTo(w,h*.2);g.lineTo(w,h);g.lineTo(w*.45,h);g.fill();
+    const sk=g.createLinearGradient(0,h*.3,0,h*.75);sk.addColorStop(0,'#bcd9ef');sk.addColorStop(1,'#eaf3f9');g.fillStyle='#8f7a5a';g.fillRect(w*.8,h*.3,w*.2,h*.5);g.fillStyle=sk;g.fillRect(w*.83,h*.33,w*.17,h*.44);
+    g.strokeStyle='rgba(90,70,45,.35)';g.lineWidth=2;g.beginPath();g.moveTo(w*.45,h*.38);g.lineTo(w*.45,h);g.stroke();
+    for(let i=0;i<9;i++){blot(w*.45+(r()-.5)*w*.5,h*.3+r()*h*.16,50+r()*70,'122,86,38',.28)}
+    for(let i=0;i<6;i++){blot(w*.45+(r()-.3)*w*.3,h*.38+r()*h*.22,35+r()*45,'110,80,40',.22)}
+    speck(w*.42,h*.3,w*.45,150,'38,28,18');speck(w*.5,h*.4,w*.2,60,'38,28,18');
+  }else if(kind==='joint'){
+    const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#a6a39b');gr.addColorStop(1,'#8d8a82');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    for(let y=0;y<h;y+=3){g.fillStyle=`rgba(255,255,255,${r()*.05})`;g.fillRect(0,y,w,1)}
+    g.fillStyle='#6f6c65';g.fillRect(0,h*.42,w,h*.05);
+    for(let i=0;i<14;i++){const x=r()*w;blot(x,h*.5,20+r()*28,'60,50,38',.4);g.fillStyle='rgba(45,40,32,.35)';g.fillRect(x-3,h*.47,6,h*(.1+r()*.35))}
+    g.strokeStyle='#2a2620';g.lineWidth=3;g.beginPath();g.moveTo(w*.1,h*.44);for(let x=w*.1;x<w*.9;x+=24)g.lineTo(x,h*.44+(r()-.5)*10);g.stroke();
+    speck(w*.5,h*.5,w*.8,110,'30,26,20');
+  }else if(kind==='terrace'){
+    const sk=g.createLinearGradient(0,0,0,h*.35);sk.addColorStop(0,'#9fc4e3');sk.addColorStop(1,'#dcebf5');g.fillStyle=sk;g.fillRect(0,0,w,h);
+    g.fillStyle='#b9b2a4';g.fillRect(0,h*.33,w,h*.67);g.fillStyle='#8c8678';g.fillRect(0,h*.3,w,h*.1);
+    for(let x=0;x<w;x+=60){g.fillStyle='rgba(0,0,0,.08)';g.fillRect(x,h*.4,2,h*.6)}
+    for(let i=0;i<5;i++)blot(w*(.2+r()*.6),h*(.55+r()*.35),50+r()*60,'70,90,60',.38);
+    blot(w*.5,h*.7,110,'60,50,40',.25);g.fillStyle='rgba(60,45,30,.5)';g.fillRect(w*.1,h*.4,w*.8,3);
+  }else if(kind==='bathroom'){
+    g.fillStyle='#e6e0d3';g.fillRect(0,0,w,h);g.strokeStyle='rgba(120,110,95,.45)';g.lineWidth=2;
+    for(let x=0;x<=w;x+=60){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke()}for(let y=0;y<=h;y+=60){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
+    for(let i=0;i<10;i++)blot(w*.3+r()*w*.2,i*h*.1,40+r()*30,'150,110,60',.3);speck(w*.35,h*.25,w*.35,90,'60,45,30');
+    g.fillStyle='#fff';g.globalAlpha=.7;for(let i=0;i<20;i++){g.fillRect(w*.3+r()*w*.25,h*.5+r()*h*.4,2+r()*6,2+r()*3)}g.globalAlpha=1;
+  }else{
+    const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#9b9a96');gr.addColorStop(1,'#6c6b68');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    for(let i=0;i<18;i++)blot(r()*w,h*(.35+r()*.6),30+r()*60,'235,235,230',.4);blot(w*.5,h*.95,w*.7,'35,38,40',.55);
+    g.fillStyle='rgba(30,30,30,.35)';g.fillRect(0,h*.62,w,2);speck(w*.5,h*.8,w*.9,120,'20,22,24');
+  }
+  const v=g.createRadialGradient(w/2,h/2,h*.3,w/2,h/2,h*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.28)');g.fillStyle=v;g.fillRect(0,0,w,h);
+  return c;
+}
+const thumbOf=(kind)=>{const c=drawScene(kind,240,280);return c.toDataURL('image/jpeg',.7)};
+const demoPhoto=async(kind)=>{const c=drawScene(kind);const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));return{url:c.toDataURL('image/jpeg',.82),blob,demo:true}};
+
+/* ---------- data ---------- */
+const TIERS={hydroloc:{name:'SmartCare Hydroloc',yrs:3,price:'₹18,500'},damp:{name:'SmartCare Damp Proof',yrs:10,price:'₹25,000'},ultra:{name:'SmartCare Damp Proof Ultra',yrs:15,price:'₹34,000'},infinia:{name:'SmartCare Infinia',yrs:25,price:'₹52,000'}};
+const tierKey=s=>{s=(s||'').toLowerCase();return s.includes('infinia')?'infinia':s.includes('ultra')?'ultra':s.includes('hydroloc')?'hydroloc':'damp'};
+const STAGES=[['Case raised','Photos and details received'],['Site visit booked','Slot confirmed with a certified expert'],['Inspection done','Cause confirmed with moisture mapping'],['Written quote approved','System and scope in writing'],['Work in progress','Stage-gated, every step photo-logged'],['Flood test passed','24-hour test before warranty'],['Warranty issued','QR record and named owner']];
+const SEED=[
+ {id:'AP-2026-0412',title:'Parapet joint leak, 3rd floor ceiling',where:'Ceiling · Top floor',stage:6,scene:'ceiling',tier:'damp',issued:'12 Oct 2026',valid:'Oct 2036',area:'Terrace and ceiling',dates:['02 Oct','03 Oct','04 Oct','06 Oct','08–10 Oct','11 Oct','12 Oct'],seed:1},
+ {id:'AP-2026-0388',title:'Bathroom wall seepage',where:'Bathroom · 2nd floor',stage:6,scene:'bathroom',tier:'hydroloc',issued:'18 Mar 2026',valid:'Mar 2029',area:'Bathroom wall and sunken slab',dates:['02 Mar','04 Mar','05 Mar','07 Mar','10–14 Mar','16 Mar','18 Mar'],seed:1},
+ {id:'AP-2026-0301',title:'Basement wall damp and salts',where:'Basement · Ground',stage:6,scene:'basement',tier:'ultra',issued:'02 Jul 2026',valid:'Jul 2041',area:'Basement retaining wall',dates:['10 Jun','11 Jun','12 Jun','15 Jun','18 Jun–28 Jun','30 Jun','02 Jul'],claim:{id:'C-118',step:3},seed:1},
+ {id:'AP-2026-0463',title:'Terrace waterproofing, new flat',where:'Terrace · Top floor',stage:4,scene:'terrace',tier:'damp',issued:'',valid:'',area:'Terrace slab',dates:['19 Oct','20 Oct','21 Oct','22 Oct','23 Oct','',''],seed:1}
+];
+let cases=[];
+const KEY='ap-assure-cases-v1';
+function loadCases(){let saved=[];try{saved=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+  cases=SEED.map(s=>{const o=saved.find(x=>x.id===s.id);return{...s,...(o||{})}});
+  saved.filter(x=>!x.seed).forEach(x=>cases.unshift(x));
+  cases.forEach(c=>{if(!c.thumb)c.thumb=thumbOf(c.scene||'ceiling')})}
+function saveCases(){try{localStorage.setItem(KEY,JSON.stringify(cases.map(c=>({...c,thumb:c.seed?undefined:c.thumb}))))}catch(e){}}
+const S={photos:[],sel:0,zoom:1,ctx:{where:'Ceiling',since:'A few weeks',floor:'Top floor',notes:''},result:null,busy:false,draft:{type:'home',date:0,slot:1,name:'',phone:'',area:''},openCase:null,flipped:false,tab:'home'};
+let cur='splash';
+
+/* ---------- navigation ---------- */
+const TABS=[['home','Home','home'],['cases','Cases','doc'],['services','Services','tool'],['learn','Learn','book']];
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
+  cur=id;const isTab=TABS.some(t=>t[0]===id);
+  if(isTab)S.tab=id;
+  const tb=$('#tabbar');tb.classList.toggle('on',isTab);
+  tb.innerHTML=TABS.map(t=>`<button data-act="go:${t[0]}" class="${t[0]===id?'on':''}">${ic(t[2])}${t[1]}</button>`).join('');
+  (R[id]||(()=>{}))();
+  const b=$('#'+id+' .body');if(b)b.scrollTop=0;
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+const topbar=(title,back,right='')=>`<div class="top"><button class="ib" data-act="go:${back}" aria-label="Back">${ic('back')}</button><h2>${title}</h2>${right||'<span class="ib"></span>'}</div>`;
+function stepper(n){const L=['Photos','Details','AI analysis','Next steps'];return`<div class="steps">${L.map((l,i)=>`<div class="st ${i<n?'done':i===n?'cur':''}"><div class="dot">${i<n?ic('check'):''}</div>${l}</div>`).join('')}</div>`}
+const activeCount=()=>cases.filter(c=>c.stage<6).length;
+
+/* ---------- screens ---------- */
+const R={};
+const houseSvg=`<svg class="house" viewBox="0 0 190 170" aria-hidden="true"><ellipse cx="110" cy="150" rx="78" ry="12" fill="#BFD9B8" opacity=".6"/><rect x="40" y="62" width="104" height="82" fill="#E8D5B8"/><rect x="40" y="62" width="104" height="14" fill="#D9C19B"/><rect x="26" y="52" width="132" height="12" rx="3" fill="#7A5C3E"/><rect x="58" y="86" width="34" height="42" fill="#9CC4DE"/><rect x="104" y="80" width="26" height="64" fill="#B57A4A"/><rect x="52" y="30" width="40" height="30" fill="#EFE0C6"/><rect x="48" y="26" width="48" height="8" rx="2" fill="#7A5C3E"/><rect x="60" y="38" width="22" height="16" fill="#9CC4DE"/><circle cx="154" cy="112" r="20" fill="#7FB07B"/><circle cx="168" cy="130" r="14" fill="#5E9A5F"/></svg>`;
+R.home=()=>{$('#home').innerHTML=`<div class="body tabpad">
+  <div class="top" style="padding:4px 0 6px"><span class="wm">asian<i>paints</i></span><button class="ib" data-act="bell" aria-label="Notifications">${ic('bell')}</button></div>
+  <div class="hero">${houseSvg}<h1>A safer, drier home with Asian Paints</h1><p>Diagnose. Fix. Protect. With certified experts.</p></div>
+  <button class="cta" data-act="start">
+    <span class="ic">${ic('camera')}</span><span><b>Report a leak</b><small>Take a few photos for a quick assessment</small></span><span class="ch">${ic('right')}</span></button>
+  <div class="tiles">
+    <button class="card tile" data-act="go:cases"><span class="tic">${ic('doc')}</span>Track<br>your cases${activeCount()?`<span class="bd">${activeCount()}</span>`:''}</button>
+    <button class="card tile" data-act="bookdirect"><span class="tic">${ic('cal')}</span>Book a<br>site visit</button>
+  </div>
+  <button class="card promo" data-act="go:services"><span class="pv"><svg viewBox="0 0 112 84" width="112" height="84" aria-hidden="true"><rect x="14" y="30" width="62" height="44" fill="#F1E3C8"/><rect x="8" y="24" width="74" height="9" fill="#7A5C3E"/><rect x="24" y="42" width="18" height="22" fill="#9CC4DE"/><rect x="50" y="40" width="16" height="34" fill="#B57A4A"/><circle cx="92" cy="58" r="14" fill="#4E8F57"/></svg></span><b>Built to last, from surface to structure</b><span class="ch">${ic('right')}</span></button>
+  </div>`};
+
+R.photos=()=>{const p=S.photos[S.sel];const z=S.zoom;
+ $('#photos').innerHTML=`${topbar('Add photos','home',`<button class="ib" data-act="help" aria-label="Help">${ic('help')}</button>`)}${stepper(0)}
+ <div class="body">
+  <p class="h3">Take clear photos of the affected area</p><p class="sub">Try to capture the whole area and a closer shot of the problem.</p>
+  <div class="vf">${p?`<img src="${p.url}" alt="Selected photo" style="transform:scale(${z===2?1.5:z===.5?1:1})">`:`<div class="empty"><div>${ic('camera')}<p style="margin:10px 0 0;font-weight:600">Tap the shutter to take or choose a photo</p></div></div>`}
+   <i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i>
+   <div class="zoom">${[.5,1,2].map(v=>`<button data-act="zoom:${v}" class="${v===z?'on':''}">${v===.5?'0.5':v===1?'1x':'2'}</button>`).join('')}</div></div>
+  <div class="thumbs">${S.photos.map((q,i)=>`<div class="th ${i===S.sel?'sel':''}" data-act="sel:${i}"><img src="${q.url}" alt="Photo ${i+1}"><button class="rm" data-act="rm:${i}" aria-label="Remove photo">${ic('x')}</button></div>`).join('')}${S.photos.length<3?`<button class="th add" data-act="upload" aria-label="Add photo">${ic('plus')}</button>`:''}${Array.from({length:Math.max(0,2-S.photos.length)},()=>'<div class="th" style="opacity:.45"></div>').join('')}</div>
+  <button class="shutter" data-act="upload" aria-label="Take photo"><span></span></button>
+  <p class="center sub" style="margin-bottom:12px">No leak handy? <button class="link" data-act="demo">Use demo photos</button></p>
+ </div><div class="foot"><button class="btn" data-act="to:details" ${S.photos.length?'':'disabled'}>Continue ${ic('right')}</button></div>`};
+
+R.details=()=>{const c=S.ctx;
+ const chips=(k,arr)=>`<div class="chips">${arr.map(v=>`<button class="chip ${c[k]===v?'on':''}" data-act="ctx:${k}:${v}">${v}</button>`).join('')}</div>`;
+ $('#details').innerHTML=`${topbar('Tell us more','photos')}${stepper(1)}<div class="body">
+  <span class="fl">Where is the problem?</span>${chips('where',['Ceiling','Wall','Terrace','Bathroom','Basement'])}
+  <span class="fl">Which floor?</span>${chips('floor',['Ground','Mid floor','Top floor'])}
+  <span class="fl">Since when?</span>${chips('since',['Just now','A few weeks','Every monsoon'])}
+  <label class="fl" for="notes">Anything else? (optional)</label>
+  <textarea id="notes" class="inp" placeholder="e.g. the stain grows after heavy rain">${esc(c.notes)}</textarea>
+  </div><div class="foot"><button class="btn" data-act="analyse">Analyse with AI ${ic('zap')}</button></div>`;
+ $('#notes').oninput=e=>{S.ctx.notes=e.target.value}};
+
+const CAUSES={Ceiling:['Water seepage from parapet joint',['Moisture pattern on ceiling','Stains starting from corner joint','Possible parapet joint gap']],Terrace:['Water ponding at terrace slab joint',['Dark patches near slab edge','Hairline crack along the joint','Likely open cold joint']],Bathroom:['Seepage through bathroom wall joint',['Streaking below tile line','Salt deposits on grout','Likely sunken slab leak']],Basement:['Rising damp and water ingress',['White salt patches (efflorescence)','Damp band along base','Poor drainage behind wall']],Wall:['Water entering through external wall crack',['Stain trail below a crack','Paint blistering near edge','Hairline crack at junction']]};
+function presetResult(note){const k=CAUSES[S.ctx.where]||CAUSES.Ceiling;const sys=S.ctx.where==='Basement'?'SmartCare Damp Proof Ultra':'SmartCare Damp Proof';
+ return{ok:true,cause:k[0],confidence:S.ctx.where==='Ceiling'?82:88,severity:'Moderate',obs:k[1],system:sys,summary:'Preliminary reading from the photos you shared.',source:'demo',note}}
+const toB64=async blob=>{const url=URL.createObjectURL(blob);const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});const k=Math.min(1,1024/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);return c.toDataURL('image/jpeg',.8).split(',')[1]};
+async function aiRead(real){
+ const images=await Promise.all(real.slice(0,3).map(p=>toB64(p.blob)));
+ const r=await fetch('/.netlify/functions/analyse',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({ctx:{where:S.ctx.where,floor:S.ctx.floor,since:S.ctx.since,notes:(S.ctx.notes||'').slice(0,300)},images})});
+ if(!r.ok)throw{code:'http_'+r.status};
+ const o=await r.json();
+ if(!o||typeof o!=='object')throw{code:'invalid_json'};
+ if(o.visible_damage===false)return{ok:false,summary:String(o.summary||'')};
+ const obs=(Array.isArray(o.observations)?o.observations:[]).slice(0,3).map(String);while(obs.length<3)obs.push('Surface staining visible');
+ return{ok:true,cause:String(o.cause||'Water seepage'),confidence:Math.max(40,Math.min(95,parseInt(o.confidence)||70)),severity:['Low','Moderate','High'].includes(o.severity)?o.severity:'Moderate',obs,system:String(o.system||'SmartCare Damp Proof'),summary:String(o.summary||''),source:'ai'}}
+const SCAN_MSG=['Reading your photos…','Mapping the moisture pattern…','Matching likely causes…','Checking against past claims…'];
+async function analyse(){
+ S.result=null;S.busy=true;go('analysis');
+ let i=0;const tm=setInterval(()=>{i=(i+1)%SCAN_MSG.length;const e=$('#scanmsg');if(e)e.textContent=SCAN_MSG[i]},750);
+ const wait=new Promise(r=>setTimeout(r,2800));let res=null;const real=S.photos.filter(p=>!p.demo);
+ if(real.length){try{res=await aiRead(real)}catch(e){res=null;S.aiErr=e&&e.code}}
+ if(!res)res=presetResult(real.length&&S.aiErr?'Live AI reading did not complete, so this is a demo reading.':'');
+ await wait;clearInterval(tm);S.result=res;S.busy=false;if(cur==='analysis')R.analysis()}
+R.analysis=()=>{const p=S.photos[0];const r=S.result;
+ if(S.busy||!r){$('#analysis').innerHTML=`${topbar('AI analysis','details')}${stepper(2)}<div class="body"><div class="scan"><img src="${p?p.url:''}" alt="Your photo being analysed"></div><div class="stat"><span id="scanmsg">${SCAN_MSG[0]}</span><small>This takes a few seconds</small></div></div>`;return}
+ if(!r.ok){$('#analysis').innerHTML=`${topbar('AI analysis','details')}${stepper(2)}<div class="body"><div class="card" style="padding:20px;text-align:center"><div class="ok-ring" style="background:var(--orange-soft);color:var(--orange-deep)">${ic('alert')}</div><div class="lock-t">We could not see damp or a leak</div><p class="sub">${esc(r.summary)||'Try a closer, well-lit photo of the stained area.'}</p></div><div style="height:14px"></div><button class="btn" data-act="go:photos">Retake photos ${ic('camera')}</button><div style="height:10px"></div><button class="btn ghost" data-act="to:next">Book a site visit anyway ${ic('right')}</button></div>`;return}
+ const low=r.confidence<85;
+ $('#analysis').innerHTML=`${topbar('AI analysis','details')}${stepper(2)}<div class="body">
+  <div class="card res"><div class="rp"><img src="${p.url}" alt="Your photo"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="38" cy="42" rx="30" ry="24" fill="none" stroke="#EE6A1F" stroke-width="1.6" stroke-dasharray="4 3"/></svg></div>
+   <div class="rt"><span class="pill o">Preliminary reading</span><small style="display:block;margin-top:8px;color:var(--navy-soft);font-size:11px">Likely cause</small><b class="big">${esc(r.cause)}</b><small style="font-size:11px;color:var(--navy-soft)">Confidence</small><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i id="cbar" style="width:0%"></i></div><b style="font-size:13px">${r.confidence}%</b></div></div></div>
+  <p class="h3" style="margin-top:16px">What we see</p>
+  <div>${r.obs.map((o,i)=>`<div class="seen"><span class="si">${ic(['drop','zap','layers'][i])}</span>${esc(o)}</div>`).join('')}</div>
+  <div class="card" style="padding:12px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:12.5px"><span><b>Severity</b> · ${esc(r.severity)}</span><span><b>Suggested</b> · ${esc(r.system.replace('SmartCare ',''))}</span></div>
+  ${low?`<div class="note" style="color:var(--orange-deep);font-weight:600">${ic('info')}<span>Confidence is below 85%, so a Senior Engineer reviews this case first.</span></div>`:''}
+  <div class="rec"><div class="rh">${ic('bulb')}Recommended next step</div><p>Get a certified inspection to confirm the cause and recommended solution.</p><button class="btn" data-act="to:next">Book a certified site visit ${ic('right')}</button></div>
+  <div class="note">${ic('shield')}<span>AI only assists. A certified expert confirms the cause before any work or warranty.${r.note?` ${esc(r.note)}`:''}${r.source==='ai'?' Read by AI from your photos.':''}</span></div></div>`;
+ requestAnimationFrame(()=>setTimeout(()=>{const b=$('#cbar');if(b)b.style.width=r.confidence+'%'},60))};
+
+R.next=()=>{$('#next').innerHTML=`${topbar('Next steps','analysis')}${stepper(3)}<div class="body">
+ <div class="nx-hero"><svg viewBox="0 0 320 178" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="178" fill="#EAD9BF"/><rect x="190" y="0" width="130" height="178" fill="#DCC8A8"/><path d="M200 16c20 8 34 4 58 18M214 28c10 6 22 12 36 10" stroke="#8F7656" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="236" cy="40" r="22" fill="#8F7656" opacity=".22"/><rect x="262" y="60" width="44" height="60" fill="#9CC4DE" rx="3"/><rect x="40" y="126" width="46" height="52" fill="#4E8F57" rx="4"/><circle cx="110" cy="92" r="21" fill="#E7B98E"/><path d="M88 86a22 20 0 0 1 44 0z" fill="#2D4C9E"/><rect x="84" y="112" width="52" height="66" rx="14" fill="#2D4C9E"/><rect x="132" y="116" width="52" height="38" rx="5" fill="#F7F4EE" transform="rotate(-8 132 116)"/><path d="M142 128h30M142 138h22" stroke="#B7AFA2" stroke-width="3" transform="rotate(-8 132 116)"/></svg></div>
+ <div class="nx-t">Certified inspection</div><p class="sub" style="font-size:13px">An Asian Paints expert will visit, confirm the cause and recommend the right waterproofing system.</p>
+ <div class="card row">${ic('shield')}Trained &amp; certified experts</div><div class="card row">${ic('doc')}Detailed report and solution plan</div><div class="card row">${ic('star')}<span>Backed by Asian Paints warranty<br><small style="font-weight:500;color:var(--navy-soft)">(on eligible systems)</small></span></div>
+ </div><div class="foot"><button class="btn" data-act="go:book">Choose a date ${ic('right')}</button></div>`};
+
+const dayList=()=>Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()+i+1);return d});
+const fmtD=d=>d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+const SLOTS=['9–11 am','11 am–1 pm','2–4 pm','4–6 pm'];
+R.book=()=>{const d=S.draft;const days=dayList();
+ const ok=d.name.trim().length>1&&/^\d{10}$/.test(d.phone.replace(/\s/g,''));
+ $('#book').innerHTML=`${topbar('Book a site visit',S.fromAnalysis?'next':'home')}<div class="body">
+  <div class="seg" role="tablist"><button class="${d.type==='home'?'on':''}" data-act="vt:home">Visit at home</button><button class="${d.type==='clinic'?'on':''}" data-act="vt:clinic">AP Assure clinic</button></div>
+  <span class="fl">Pick a date</span><div class="dates">${days.map((x,i)=>`<button class="dt ${i===d.date?'on':''}" data-act="dd:${i}"><small>${x.toLocaleDateString('en-IN',{weekday:'short'})}</small><b>${x.getDate()}</b><small>${x.toLocaleDateString('en-IN',{month:'short'})}</small></button>`).join('')}</div>
+  <span class="fl">Pick a time</span><div class="slots">${SLOTS.map((s,i)=>`<button class="slot ${i===d.slot?'on':''}" data-act="sl:${i}" ${(i===0&&d.date%3===1)||(i===3&&d.date%4===2)?'disabled':''}>${s}${i===d.slot?ic('check'):''}</button>`).join('')}</div>
+  <label class="fl" for="nm">Your name</label><input id="nm" class="inp" value="${esc(d.name)}" placeholder="Full name" autocomplete="name">
+  <label class="fl" for="ph" style="margin-top:12px">Mobile number</label><input id="ph" class="inp" value="${esc(d.phone)}" inputmode="numeric" maxlength="10" placeholder="10-digit number" autocomplete="tel">
+  <div class="card sum" style="margin-top:16px"><b>${d.type==='home'?'Home visit':'Clinic visit'}</b> · ${fmtD(days[d.date])}, ${SLOTS[d.slot]}<br>${S.photos.length?`${S.photos.length} photo${S.photos.length>1?'s':''} attached · `:''}Visit fee waived for the pilot</div>
+  </div><div class="foot"><button class="btn" id="confirmBtn" data-act="confirm" ${ok?'':'disabled'}>Confirm booking ${ic('check')}</button></div>`;
+ const upd=()=>{S.draft.name=$('#nm').value;S.draft.phone=$('#ph').value.replace(/\D/g,'');$('#ph').value=S.draft.phone;const v=S.draft.name.trim().length>1&&S.draft.phone.length===10;$('#confirmBtn').disabled=!v};
+ $('#nm').oninput=upd;$('#ph').oninput=upd};
+
+const statusPill=c=>c.stage>=6?`<span class="pill g">${ic('shield')}Warranty active</span>`:`<span class="pill o">${STAGES[c.stage][0]}</span>`;
+R.cases=()=>{$('#cases').innerHTML=`<div class="body tabpad"><div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Your cases</h2><span class="pill n">${cases.length} total</span></div><p class="sub" style="margin-bottom:14px">Tap a case to see progress and its warranty.</p>
+ ${cases.map(c=>`<button class="card cc" data-act="case:${c.id}"><span class="cp"><img src="${c.thumb}" alt=""></span><span class="ct"><b>${esc(c.title)}</b><small>${esc(c.id)} · ${esc(c.where)}</small>${statusPill(c)}<span class="prog ${c.stage>=6?'ok':''}">${STAGES.map((_,i)=>`<i class="${i<=c.stage?'f':''}"></i>`).join('')}</span></span>${ic('right')}</button>`).join('')}</div>`};
+
+function qrSvg(text){
+ try{const q=qrcode(0,'M');q.addData(text);q.make();return q.createSvgTag({cellSize:4,margin:0,scalable:true}).replace(/fill="black"/g,'fill="#16264A"')}catch(e){
+  const n=25;let h=0;for(const ch of text)h=(h*31+ch.charCodeAt(0))>>>0;const r=rng(h%2147483646+1);let s='';
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){const f=(a,b)=>(x>=a&&x<a+7&&y>=b&&y<b+7);const fin=f(0,0)||f(n-7,0)||f(0,n-7);let on=r()>.52;if(fin){const lx=x%(n-7===x||x>=n-7?1:1);const ax=x>=n-7?x-(n-7):x,ay=y>=n-7?y-(n-7):y;on=!(ax>0&&ax<6&&ay>0&&ay<6)||(ax>1&&ax<5&&ay>1&&ay<5)}
+   if(on)s+=`<rect x="${x}" y="${y}" width="1.02" height="1.02"/>`}
+  return`<svg viewBox="0 0 ${n} ${n}" fill="#16264A" shape-rendering="crispEdges">${s}</svg>`}}
+const qrText=c=>{const t=TIERS[c.tier];return`AP ASSURE WARRANTY | Job ${c.id} | ${t.name} | ${t.yrs} years | Valid to ${c.valid} | Prototype record`};
+const CLAIM=[['Claim raised','Day 0'],['Technician assigned','Same day'],['Visit booked','You pick the slot'],['Fixed at no charge','Closed and logged']];
+R.case=()=>{const c=cases.find(x=>x.id===S.openCase);if(!c){go('cases');return}const t=TIERS[c.tier];const done=c.stage>=6;
+ const tl=STAGES.map((s,i)=>{const st=i<c.stage||done?'done':i===c.stage?'cur':'pend';return`<div class="tls ${st}"><span class="d">${st==='done'?ic('check'):''}</span><div><b>${s[0]}</b><small>${c.dates&&c.dates[i]?esc(c.dates[i])+' · ':''}${s[1]}</small></div></div>`}).join('');
+ let war='';
+ if(done){war=`<div class="flip ${S.flipped?'back':''}" id="flip"><div class="fi">
+   <div class="face"><div class="wh"><span>AP Assure</span><small>Waterproofing warranty</small></div>
+    <div class="wb"><button class="qr" data-act="joblog" aria-label="Open job log from QR">${qrSvg(qrText(c))}</button><div class="wy"><b>${t.yrs}<small>YEARS</small></b><span>Valid until ${esc(c.valid)}<br>${esc(t.name.replace('SmartCare ',''))} cover<br>Job ${esc(c.id)}</span></div></div>
+    <div class="ticks"><div>${ic('check')}Surface prepared</div><div>${ic('check')}Flood test passed</div><div>${ic('check')}Both coats logged</div></div>
+    <div class="wf"><span>Issued ${esc(c.issued)}</span><em>Scan to open the job log</em></div></div>
+   <div class="face bk"><div class="wh" style="background:var(--navy)"><span>Scan to</span><small>Terms apply</small></div>
+    <div class="ticks" style="padding:20px 18px;gap:14px;font-size:14px"><div>${ic('check')}Open your job log</div><div>${ic('check')}Raise a claim</div><div>${ic('check')}See who did what, and when</div><div>${ic('check')}Share with a buyer or tenant</div></div>
+    <div class="wf" style="position:absolute;bottom:0;left:0;right:0"><span>Covers ${esc(c.area)}</span><em>${esc(t.price)} job (illustrative)</em></div></div></div></div>
+   <div class="two"><button class="btn ghost sm" data-act="flipcard">${ic('flip')}Flip card</button><button class="btn sm" data-act="joblog">${ic('qr')}Open job log</button></div>`;
+  war+=c.claim?`<div class="card claim"><h4>Claim ${esc(c.claim.id)}${c.claim.step>=3?'<span class="pill g">Closed</span>':'<span class="pill o">In progress</span>'}</h4>${CLAIM.map((s,i)=>`<div class="tls ${i<=c.claim.step?'done':i===c.claim.step+1?'cur':'pend'}" style="padding:7px 0"><span class="d">${i<=c.claim.step?ic('check'):''}</span><div><b>${s[0]}</b><small>${s[1]}</small></div></div>`).join('')}${c.claim.step<3?`<button class="btn ghost sm" style="margin-top:6px" data-act="claimadv:${c.id}">Move claim forward (demo)</button>`:`<small style="color:var(--navy-soft)">No paperwork needed.</small>`}</div>`:`<button class="btn ghost" data-act="claim:${c.id}">Raise a claim ${ic('right')}</button>`;
+ }else{war=`<div class="card locked"><div class="lq"></div><div class="lock-t">${ic('lock')} Warranty QR comes after the flood test</div><p class="sub" style="margin:0">Recommended cover: ${esc(t.name.replace('SmartCare ',''))}, ${t.yrs} years, ${esc(t.price)} (illustrative).</p></div><button class="btn" data-act="adv:${c.id}">${c.stage>=5?'Issue warranty (demo)':'Move to next stage (demo)'} ${ic('right')}</button>`}
+ $('#case').innerHTML=`${topbar(esc(c.id),'cases')}<div class="body"><div class="card cs"><span class="cp"><img src="${c.thumb}" alt=""></span><div>${statusPill(c)}<b>${esc(c.title)}</b><small>${esc(c.where)}</small></div></div>
+ <p class="h3">Progress</p><div class="card tl">${tl}</div><p class="h3">Warranty</p>${war}</div>`};
+
+R.services=()=>{$('#services').innerHTML=`<div class="body tabpad"><div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Services</h2></div><p class="sub" style="margin-bottom:14px">One promise: diagnosed once, protected for years.</p>
+ ${[['camera','AI photo diagnosis','Share photos, get a plain-language first read in minutes.','start'],['tool','Certified inspection','A trained expert confirms the cause with moisture mapping.','bookdirect'],['shield','AP Assure warranty','3, 10, 15 or 25 year cover with a QR record you can check any time.','go:cases'],['home','Pre-monsoon check','Protect it before it fails. A call and a visit before the rains.','bookdirect']].map(s=>`<button class="card cc" data-act="${s[3]}"><span class="cp" style="display:grid;place-items:center;background:var(--orange-soft);color:var(--orange-deep)">${ic(s[0])}</span><span class="ct"><b>${s[1]}</b><small style="margin:0">${s[2]}</small></span>${ic('right')}</button>`).join('')}</div>`};
+R.learn=()=>{$('#learn').innerHTML=`<div class="body tabpad"><div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Learn</h2></div><p class="sub" style="margin-bottom:14px">Short reads for a drier home.</p>
+ ${[['Why one coat is not enough','Terraces, bathrooms and basements leak for different reasons, so each needs its own test and system.'],['What a flood test proves','Water is held on the surface for 24 hours. Your warranty is issued only if it passes.'],['Before the first monsoon','Check parapet joints, drain outlets and pipe sleeves while the weather is dry.'],['Reading your warranty QR','Scan it to see the surface prep, each coat, the flood test and who signed off.']].map(l=>`<div class="card learn"><b>${l[0]}</b><p>${l[1]}</p></div>`).join('')}</div>`};
+
+/* ---------- actions ---------- */
+function openSheet(html){$('#sheetBody').innerHTML=html;$('#sheet').classList.add('on')}
+const closeSheet=()=>$('#sheet').classList.remove('on');
+function jobLog(c){const t=TIERS[c.tier];const rows=[['Surface prepared','09:10'],['Primer applied, cured 6 h','11:40'],['Coat 1 applied','16:05'],['Coat 2 applied','Next day 10:20'],['Flood test, 24 h: passed','Day 3 10:45']];
+ openSheet(`<h3>Job log · ${esc(c.id)}</h3><p class="sub">${esc(t.name)} · ${esc(c.area)}. Each stage is logged with a photo and a time stamp.</p>${rows.map(r=>`<div class="card log">${ic('check')}${r[0]}<small>${r[1]}</small></div>`).join('')}<div class="card log" style="margin-bottom:14px">${ic('drop')}Moisture after test<small>11%</small></div><button class="btn" data-act="closesheet">Close</button>`)}
+function addPhoto(file){if(!file)return;const url=URL.createObjectURL(file);S.photos.push({url,blob:file,demo:false});S.sel=S.photos.length-1;R.photos()}
+$('#file').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(S.photos.length>=3){toast('You can add up to 3 photos');return}addPhoto(f)};
+function newCase(){const d=S.draft,days=dayList();const n=String(500+Math.floor(Math.random()*400));const r=S.result&&S.result.ok?S.result:null;
+ const tk=tierKey(r?r.system:'');const scene=S.ctx.where==='Bathroom'?'bathroom':S.ctx.where==='Basement'?'basement':S.ctx.where==='Terrace'?'terrace':'ceiling';
+ const thumb=S.photos[0]?null:thumbOf(scene);
+ const mk=thumbUrl=>{const c={id:'AP-2026-0'+n,title:r?r.cause:'Site inspection request',where:`${S.ctx.where} · ${S.ctx.floor}`,stage:1,scene,tier:tk,issued:'',valid:'',area:S.ctx.where+' area',dates:[new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'}),fmtD(days[d.date]).replace(/^\w+, /,'')+' · '+SLOTS[d.slot],'','','','',''],thumb:thumbUrl};cases.unshift(c);saveCases();S.openCase=c.id;S.photos=[];S.sel=0;S.result=null;
+  openSheet(`<div class="center"><div class="ok-ring">${ic('check')}</div><h3>Visit booked</h3><p class="sub">Case ${esc(c.id)}. An Asian Paints expert visits on ${esc(fmtD(days[d.date]))}, ${SLOTS[d.slot]}.</p></div><button class="btn" data-act="viewcase">View your case ${ic('right')}</button>`)};
+ if(S.photos[0]){const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=240;cv.height=240;cv.getContext('2d').drawImage(im,0,0,240,240);mk(cv.toDataURL('image/jpeg',.7))};im.onerror=()=>mk(thumbOf(scene));im.src=S.photos[0].url}else mk(thumb)}
+function advance(id){const c=cases.find(x=>x.id===id);if(!c)return;c.stage=Math.min(6,c.stage+1);
+ const today=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'});c.dates=c.dates||[];c.dates[c.stage]=today;
+ if(c.stage>=6){const d=new Date();c.issued=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});const v=new Date(d.getFullYear()+TIERS[c.tier].yrs,d.getMonth(),1);c.valid=v.toLocaleDateString('en-IN',{month:'short',year:'numeric'});toast('Warranty issued. Your QR is ready.')}
+ saveCases();R.case()}
+const A={
+ go:v=>go(v),bell:()=>toast('You have no new alerts. Pre-monsoon check reminders appear here.'),help:()=>toast('Tip: capture the whole area, then a close-up of the stain.'),
+ start:()=>{S.photos=[];S.sel=0;S.result=null;S.fromAnalysis=true;go('photos')},
+ bookdirect:()=>{S.photos=[];S.result=null;S.fromAnalysis=false;go('book')},
+ upload:()=>{if(S.photos.length>=3){toast('You can add up to 3 photos');return}$('#file').click()},
+ demo:async()=>{S.photos=await Promise.all(['ceiling','joint','terrace'].map(demoPhoto));S.sel=0;S.ctx.where='Ceiling';R.photos()},
+ sel:i=>{S.sel=+i;R.photos()},rm:(i,e)=>{S.photos.splice(+i,1);S.sel=0;R.photos()},zoom:v=>{S.zoom=+v;R.photos()},
+ to:v=>{if(v==='next'||v==='details')S.fromAnalysis=true;go(v)},
+ ctx:(k,v)=>{S.ctx[k]=v;R.details()},analyse:()=>analyse(),
+ vt:v=>{S.draft.type=v;R.book()},dd:i=>{S.draft.date=+i;R.book()},sl:i=>{S.draft.slot=+i;R.book()},
+ confirm:()=>newCase(),viewcase:()=>{closeSheet();go('case')},
+ case:id=>{S.openCase=id;S.flipped=false;go('case')},flipcard:()=>{S.flipped=!S.flipped;$('#flip').classList.toggle('back',S.flipped)},
+ joblog:()=>{const c=cases.find(x=>x.id===S.openCase);if(c)jobLog(c)},closesheet:closeSheet,
+ adv:id=>advance(id),
+ claim:id=>{const c=cases.find(x=>x.id===id);c.claim={id:'C-'+(100+Math.floor(Math.random()*800)),step:0};saveCases();toast('Claim raised. No paperwork needed.');R.case()},
+ claimadv:id=>{const c=cases.find(x=>x.id===id);c.claim.step=Math.min(3,c.claim.step+1);saveCases();R.case()}
+};
+$('#phone').addEventListener('click',e=>{
+ if(e.target===$('#sheet')){closeSheet();return}
+ const el=e.target.closest('[data-act]');if(!el)return;
+ if(el.classList.contains('rm')||e.target.closest('.rm')){const rm=e.target.closest('.rm');if(rm){e.stopPropagation();A.rm(rm.dataset.act.split(':')[1]);return}}
+ const parts=el.dataset.act.split(':');const f=A[parts[0]];if(f)f(...parts.slice(1),e)});
+
+/* ---------- boot ---------- */
+loadCases();
+setTimeout(()=>{if(cur==='splash')go('home')},2200);
+</script>
+</body></html>
