@@ -231,6 +231,15 @@ textarea.inp{resize:none;height:80px}
 .pl svg{color:var(--green);stroke-width:3;width:16px;height:16px}
 .pl small{display:block;color:var(--navy-soft);font-weight:500;font-size:11px}
 .pl em{margin-left:auto;font-style:normal;font-weight:800;color:var(--green);white-space:nowrap}
+.rs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#EFE4D3;padding:4px;border-radius:14px;margin:4px 0 12px}
+.rs button{display:flex;gap:6px;align-items:center;justify-content:center;padding:9px 6px;border-radius:11px;font-weight:700;font-size:12.5px;color:var(--navy-soft)}
+.rs button.on{background:var(--navy);color:#fff}.rs svg{width:16px;height:16px}
+.rc{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border-radius:22px;padding:18px;margin-bottom:14px;color:#fff;box-shadow:0 14px 26px -14px rgba(22,38,74,.7)}
+.rc.c{background:linear-gradient(135deg,#F37A2E,#E85C14)}.rc.d{background:linear-gradient(135deg,#223868,#16264A)}
+.rc .ic{width:54px;height:54px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+.rc.c .ic{color:var(--orange)}.rc.d .ic{color:var(--navy)}.rc .ic svg{width:27px;height:27px}
+.rc b{display:block;font-size:17px;margin-bottom:3px}.rc small{display:block;opacity:.92;font-size:12.5px;line-height:1.4}
+.rc .ch{margin-left:auto}
 .dl{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;background:rgba(22,38,74,.88);color:#fff;font-weight:700;font-size:12.5px;padding:9px 16px;border-radius:99px;white-space:nowrap}
 @media (max-width:520px){.phone{border-width:6px;border-radius:34px}.sb,.notch{display:none}.screen{padding-top:12px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -246,9 +255,9 @@ textarea.inp{resize:none;height:80px}
     <div class="blob" style="width:380px;height:300px;left:-90px;bottom:-110px;background:radial-gradient(circle at 40% 30%,#F7A040,#E5532B 55%,#B3261E)"></div>
     <div class="blob" style="width:200px;height:200px;left:70px;bottom:-130px;background:radial-gradient(circle,#8B54C0,#4F3A9A)"></div>
     <div class="sp-mark"><div class="sp-ring"></div><div class="wm">asian<i>paints</i></div><p>Homes for what's next</p></div>
-    <button class="dl" data-act="go:dealer">I'm a dealer</button>
   </section>
 
+  <section class="screen" id="role"></section>
   <section class="screen" id="home"></section>
   <section class="screen" id="photos"></section>
   <section class="screen" id="details"></section>
@@ -294,7 +303,8 @@ flip:'<path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 1
 img:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
 lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
 info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
-bulb:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V18h6v-1.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/>'
+bulb:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V18h6v-1.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/>',
+store:'<path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/>'
 };
 const ic=(n,c='')=>`<svg class="i ${c}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||''}</svg>`;
 
@@ -394,13 +404,20 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 const topbar=(title,back,right='')=>`<div class="top"><button class="ib" data-act="go:${back}" aria-label="Back">${ic('back')}</button><h2>${title}</h2>${right||'<span class="ib"></span>'}</div>`;
 function stepper(n){const L=['Photos','Details','AI analysis','Next steps'];return`<div class="steps">${L.map((l,i)=>`<div class="st ${i<n?'done':i===n?'cur':''}"><div class="dot">${i<n?ic('check'):''}</div>${l}</div>`).join('')}</div>`}
 const activeCount=()=>cases.filter(c=>c.stage<6).length;
+const roleSw=w=>`<div class="rs" role="tablist" aria-label="Switch app side"><button class="${w==='c'?'on':''}" data-act="role:customer">${ic('home')}Customer app</button><button class="${w==='d'?'on':''}" data-act="role:dealer">${ic('store')}Dealer app</button></div>`;
 const clinicCard=(id,change)=>{const k=CLINICS[id];return`<div class="card clc"><span class="clic">${ic('pin')}</span><span class="clt"><small>Your AP Assure clinic</small><b>${esc(k.name)}</b><small>${esc(k.area)} · ${esc(k.dist)}</small></span>${change?`<button class="link" data-act="clinics">Change</button>`:''}</div>`};
 
 /* ---------- screens ---------- */
 const R={};
 const houseSvg=`<svg class="house" viewBox="0 0 190 170" aria-hidden="true"><ellipse cx="110" cy="150" rx="78" ry="12" fill="#BFD9B8" opacity=".6"/><rect x="40" y="62" width="104" height="82" fill="#E8D5B8"/><rect x="40" y="62" width="104" height="14" fill="#D9C19B"/><rect x="26" y="52" width="132" height="12" rx="3" fill="#7A5C3E"/><rect x="58" y="86" width="34" height="42" fill="#9CC4DE"/><rect x="104" y="80" width="26" height="64" fill="#B57A4A"/><rect x="52" y="30" width="40" height="30" fill="#EFE0C6"/><rect x="48" y="26" width="48" height="8" rx="2" fill="#7A5C3E"/><rect x="60" y="38" width="22" height="16" fill="#9CC4DE"/><circle cx="154" cy="112" r="20" fill="#7FB07B"/><circle cx="168" cy="130" r="14" fill="#5E9A5F"/></svg>`;
+R.role=()=>{$('#role').innerHTML=`<div class="body" style="display:flex;flex-direction:column;justify-content:center">
+  <div class="center" style="margin-bottom:18px"><span class="wm" style="font-size:26px">asian<i>paints</i></span><div style="font-weight:800;font-size:22px;margin-top:10px;letter-spacing:-.3px">AP Assure prototype</div><p class="sub" style="margin:6px 0 0">Choose a side to explore. You can switch any time.</p></div>
+  <button class="rc c" data-act="role:customer"><span class="ic">${ic('home')}</span><span><b>Customer app</b><small>Report a leak, get an AI first read, book your clinic, track cases and warranty QR.</small></span><span class="ch">${ic('right')}</span></button>
+  <button class="rc d" data-act="role:dealer"><span class="ic">${ic('store')}</span><span><b>Dealer app</b><small>Receive app leads, assign technicians and see Assure Points credited.</small></span><span class="ch">${ic('right')}</span></button>
+  <p class="sub center" style="margin:6px 8px 0">Both sides use the same data: a booking made in the customer app appears in the dealer app.</p></div>`};
 R.home=()=>{$('#home').innerHTML=`<div class="body tabpad">
   <div class="top" style="padding:4px 0 6px"><span class="wm">asian<i>paints</i></span><button class="ib" data-act="bell" aria-label="Notifications">${ic('bell')}</button></div>
+  ${roleSw('c')}
   <div class="hero">${houseSvg}<h1>A safer, drier home with Asian Paints</h1><p>Diagnose. Fix. Protect. With certified experts.</p></div>
   <button class="cta" data-act="start">
     <span class="ic">${ic('camera')}</span><span><b>Report a leak</b><small>Take a few photos for a quick assessment</small></span><span class="ch">${ic('right')}</span></button>
@@ -410,7 +427,6 @@ R.home=()=>{$('#home').innerHTML=`<div class="body tabpad">
   </div>
   ${clinicCard(S.clinic,true)}
   <button class="card promo" data-act="go:services"><span class="pv"><svg viewBox="0 0 112 84" width="112" height="84" aria-hidden="true"><rect x="14" y="30" width="62" height="44" fill="#F1E3C8"/><rect x="8" y="24" width="74" height="9" fill="#7A5C3E"/><rect x="24" y="42" width="18" height="22" fill="#9CC4DE"/><rect x="50" y="40" width="16" height="34" fill="#B57A4A"/><circle cx="92" cy="58" r="14" fill="#4E8F57"/></svg></span><b>Built to last, from surface to structure</b><span class="ch">${ic('right')}</span></button>
-  <p class="center sub" style="margin:16px 0 0">Run a dealer clinic? <button class="link" data-act="dealer">Open dealer view</button></p>
   </div>`};
 
 R.photos=()=>{const p=S.photos[S.sel];const z=S.zoom;
@@ -498,7 +514,7 @@ R.book=()=>{const d=S.draft;const days=dayList();const k=CLINICS[S.clinic];
  $('#nm').oninput=upd;$('#ph').oninput=upd};
 
 const statusPill=c=>c.stage>=6?`<span class="pill g">${ic('shield')}Warranty active</span>`:`<span class="pill o">${STAGES[c.stage][0]}</span>`;
-R.cases=()=>{$('#cases').innerHTML=`<div class="body tabpad"><div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Your cases</h2><span class="pill n">${cases.length} total</span></div><p class="sub" style="margin-bottom:14px">Tap a case to see progress and its warranty.</p>
+R.cases=()=>{$('#cases').innerHTML=`<div class="body tabpad">${roleSw('c')}<div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Your cases</h2><span class="pill n">${cases.length} total</span></div><p class="sub" style="margin-bottom:14px">Tap a case to see progress and its warranty.</p>
  ${cases.map(c=>`<button class="card cc" data-act="case:${c.id}"><span class="cp"><img src="${c.thumb}" alt=""></span><span class="ct"><b>${esc(c.title)}</b><small>${esc(c.id)} · ${esc(c.where)}</small>${statusPill(c)}<span class="prog ${c.stage>=6?'ok':''}">${STAGES.map((_,i)=>`<i class="${i<=c.stage?'f':''}"></i>`).join('')}</span></span>${ic('right')}</button>`).join('')}</div>`};
 
 function qrSvg(text){
@@ -527,16 +543,17 @@ R.case=()=>{const c=cases.find(x=>x.id===S.openCase);if(!c){go('cases');return}c
  <div class="card clc" style="margin-top:0"><span class="clic">${ic('pin')}</span><span class="clt"><small>Handled by your AP Assure clinic</small><b>${esc(clOf(c).name)}</b><small>Technician ${esc(c.tech||clOf(c).techs[0])} · materials supplied and billed through your clinic</small><span class="pill ${c.accepted?'g':'o'}" style="margin-top:6px">${c.accepted?'Confirmed by clinic':'Awaiting clinic confirmation'}</span></span></div>
  <p class="h3">Progress</p><div class="card tl">${tl}</div><p class="h3">Warranty</p>${war}${done&&c.xsell?`<div class="card learn" style="margin-top:12px"><b>Suggested by your technician</b><p>${esc(c.xsell)}. ${esc(clOf(c).short)} will contact you with options.</p></div>`:''}</div>`};
 
-R.services=()=>{$('#services').innerHTML=`<div class="body tabpad"><div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Services</h2></div><p class="sub" style="margin-bottom:14px">One promise: diagnosed once, protected for years.</p>
+R.services=()=>{$('#services').innerHTML=`<div class="body tabpad">${roleSw('c')}<div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Services</h2></div><p class="sub" style="margin-bottom:14px">One promise: diagnosed once, protected for years.</p>
  ${[['camera','AI photo diagnosis','Share photos, get a plain-language first read in minutes.','start'],['tool','Certified inspection','A technician from your clinic confirms the cause with moisture mapping.','bookdirect'],['shield','AP Assure warranty','3, 10, 15 or 25 year cover with a QR record you can check any time.','go:cases'],['home','Pre-monsoon check','Protect it before it fails. A call and a visit before the rains.','bookdirect']].map(s=>`<button class="card cc" data-act="${s[3]}"><span class="cp" style="display:grid;place-items:center;background:var(--orange-soft);color:var(--orange-deep)">${ic(s[0])}</span><span class="ct"><b>${s[1]}</b><small style="margin:0">${s[2]}</small></span>${ic('right')}</button>`).join('')}</div>`};
-R.learn=()=>{$('#learn').innerHTML=`<div class="body tabpad"><div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Learn</h2></div><p class="sub" style="margin-bottom:14px">Short reads for a drier home.</p>
+R.learn=()=>{$('#learn').innerHTML=`<div class="body tabpad">${roleSw('c')}<div class="top" style="padding:4px 0 2px"><h2 style="font-size:22px;font-weight:800">Learn</h2></div><p class="sub" style="margin-bottom:14px">Short reads for a drier home.</p>
  ${[['Why one coat is not enough','Terraces, bathrooms and basements leak for different reasons, so each needs its own test and system.'],['What a flood test proves','Water is held on the surface for 24 hours. Your warranty is issued only if it passes.'],['Before the first monsoon','Check parapet joints, drain outlets and pipe sleeves while the weather is dry.'],['Reading your warranty QR','Scan it to see the surface prep, each coat, the flood test and who signed off.']].map(l=>`<div class="card learn"><b>${l[0]}</b><p>${l[1]}</p></div>`).join('')}</div>`};
 
 /* ---------- dealer view ---------- */
 R.dealer=()=>{const id=S.dealer||S.clinic||'c1';S.dealer=id;const k=CLINICS[id];const L=ledger(id);const mine=cases.filter(c=>(c.clinic||'c1')===id);
  const leads=mine.filter(c=>!c.accepted);const xs=mine.filter(c=>c.xsell&&!c.xsellDone&&c.stage>=6);const warr=mine.filter(c=>c.stage>=6).length;
- $('#dealer').innerHTML=`${topbar('Dealer view','home')}<div class="body">
-  <span class="fl" style="margin-top:0">Viewing as</span>
+ $('#dealer').innerHTML=`${topbar('Dealer app','home')}<div class="body">
+  ${roleSw('d')}
+  <span class="fl" style="margin-top:0">Viewing clinic</span>
   <div class="chips" style="margin:6px 0 4px">${Object.keys(CLINICS).map(i=>`<button class="chip ${i===id?'on':''}" data-act="dealerpick:${i}">${esc(CLINICS[i].short)}</button>`).join('')}</div>
   <div class="card pts"><small>${esc(k.name)} · AP Assure Clinic</small><span class="pn">${ic('star')}${L.total}</span><small>Assure Points credited</small>
    <div class="ps"><span><b>${mine.length}</b>Cases from the app</span><span><b>${warr}</b>Warranties issued</span><span><b>${L.out.length}</b>Credits</span></div></div>
@@ -587,6 +604,7 @@ const A={
  claim:id=>{const c=cases.find(x=>x.id===id);c.claim={id:'C-'+(100+Math.floor(Math.random()*800)),step:0};saveCases();toast('Claim raised. No paperwork needed.');R.case()},
  clinics:()=>openSheet(`<h3>Choose your AP Assure clinic</h3><p class="sub">Every case is handled by a dealer clinic near you.</p>${Object.keys(CLINICS).map(i=>{const k=CLINICS[i];return`<button class="card clc" style="width:100%;text-align:left;${i===S.clinic?'border-color:var(--orange);background:var(--orange-tint)':''}" data-act="pickclinic:${i}"><span class="clic">${ic('pin')}</span><span class="clt"><b>${esc(k.name)}</b><small>${esc(k.area)} · ${esc(k.dist)}</small></span>${i===S.clinic?ic('check'):''}</button>`}).join('')}<p class="sub" style="margin:8px 0 14px">Illustrative pilot clinics. If your area has no clinic yet, we connect you to your nearest BHPS dealer.</p><button class="btn ghost" data-act="closesheet">Close</button>`),
  pickclinic:i=>{S.clinic=i;closeSheet();if(R[cur])R[cur]()},
+ role:w=>{if(w==='dealer'){S.dealer=S.clinic;go('dealer')}else go('home')},
  dealer:()=>{S.dealer=S.clinic;go('dealer')},dealerpick:i=>{S.dealer=i;R.dealer()},
  techpick:(id,n)=>{const c=cases.find(x=>x.id===id);if(c){c.tech=n;saveCases()}R.dealer()},
  accept:id=>{const c=cases.find(x=>x.id===id);if(!c)return;c.accepted=true;saveCases();toast('Lead accepted. +'+PTS.lead+' points credited');R.dealer()},
@@ -601,6 +619,6 @@ $('#phone').addEventListener('click',e=>{
 
 /* ---------- boot ---------- */
 loadCases();
-setTimeout(()=>{if(cur==='splash')go('home')},2200);
+setTimeout(()=>{if(cur==='splash')go('role')},2200);
 </script>
 </body></html>
